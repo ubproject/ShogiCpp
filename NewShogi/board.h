@@ -81,7 +81,7 @@ private:
 		}
 		//“®‚«•û‚ª‚¨‚©‚µ‚¢ê‡
 		if (!data->is_true_move(from, to)) {
-			errout("“®‚«•û‚ªˆá‚¢‚Ü‚·B(is_true_move)\n",0);
+			errout("“®‚«•û‚ªˆá‚¢‚Ü‚·B\n",0);
 			return false;
 		}
 		//Ÿ”s”»’è

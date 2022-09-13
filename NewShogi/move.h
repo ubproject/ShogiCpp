@@ -12,7 +12,7 @@ is_upなどはそのことをあらかじめ想定して作成されている。
 */
 //移動したか
 bool is_hold(position from, position to) {
-	return (from.x==to.x&&from.y==from.y);
+	return (from.x==to.x&&to.y==from.y);
 }
 //上
 bool is_up(position from, position to,ID user) {
@@ -25,7 +25,7 @@ bool is_up_all(position from,position to,ID user){
 }
 //下
 bool is_down(position from, position to,ID user) {
-	return (((from.y - 1) == to.y) && user == user2) || (((from.y + 1) == to.y) && user == user1);
+	return (((from.y + 1) == to.y) && user == user2) || (((from.y - 1) == to.y) && user == user1);
 }
 //左
 bool is_left(position from, position to,ID user) {
@@ -37,8 +37,8 @@ bool is_right(position from, position to,ID user) {
 }
 //上下左右
 bool is_UpDownLeftRight(position from,position to,ID user) {
-	MINI count = 0;
-	return (count=is_up(from, to, user) + is_down(from, to, user) + is_left(from, to,user) + is_right(from, to,user))==1?true:false;
+	MINI count = is_up(from, to, user) + is_down(from, to, user) + is_left(from, to, user) + is_right(from, to, user);
+	return count==1?true:false;
 }
 /*斜め*/
 //右上

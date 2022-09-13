@@ -214,7 +214,6 @@ public:
 			//¬‚Í‹à‚Æ“¯‚¶“®‚«
 			return is_kin_move(from,to,user_id);
 		}else {
-			printf("Ô‚Ì“®‚«?\n");
 			//Ô‚Ì“®‚«(‚’¼‚É“®‚­)
 			return is_up_all(from, to,user_id);
 		}
