@@ -2,7 +2,24 @@
 #include <time.h>
 #include <stdlib.h>
 
-//駒操作 終了の場合true
+
+void delayprint(const char* text) {
+	for (UINT i = 0; i < strlen(text);i++) {
+		printf("%c",*(text+i));
+		Sleep((DWORD)50);
+	}
+}
+void delayprint_color(const char* text,colors c) {
+	set_console_color(c,colors::black);
+	for (UINT i = 0; i < strlen(text); i++) {
+		printf("%c", *(text + i));
+		Sleep((DWORD)100);
+	}
+	set_console_color();
+}
+
+
+//駒操作
 bool selectdialog(board* main,ID user) {
 	printf("\n操作を選択してください。\nAキー:一手指す\nBキー:持ち駒を指す\nCキー:再表示\nDキー:降参する\n");
 	switch (_getwch()) {
@@ -128,13 +145,22 @@ void testmode() {
 		main.command_cls();
 	}
 }
-//操作説明
-void explanation() {
-	//未完成
+
+//詳細
+void info() {
+	system("cls");
+	delayprint_color("プログラムの詳細\n",colors::green);
+	delayprint("ProjectName:Shogi\n");
+	delayprint("Author  :SanaeProject\n");
+	delayprint("Language:C++\n");
+	delayprint("Editor  :VisualStudio2022\n");
+	delayprint_color("\nVersion:2.0\n",colors::yellow);
+	system("pause");
+	return;
 }
 
 void dialog() {
-	printf("モードを選択してください。\nAキー:対戦\nBキー:お試しモード\nCキー:操作説明\n\n");
+	printf("モードを選択してください。\nAキー:対戦\nBキー:お試しモード\nCキー:プログラムの詳細\n\n");
 	switch (_getwch()) {
 	case 'a':
 		normalmode();
@@ -143,7 +169,7 @@ void dialog() {
 		testmode();
 		break;
 	case 'c':
-		explanation();
+		info();
 		break;
 	default:
 		errout("不明なモードです。再入力してください。\n",2);
@@ -155,9 +181,9 @@ int main(){
 	while (1) {
 		system("cls");
 		set_console_color(colors::black, colors::white);
-		printf("将棋プログラム Ver:2.0\n");
+		delayprint("将棋プログラム Ver:2.0\n");
 		set_console_color();
-		printf("ProjectName:Shogi\nDev:SanaeProject\nVer:2.0\n\n");
+		delayprint("ProjectName:Shogi\nDev:SanaeProject\nVer:2.0\n\n");
 		dialog();
 	}
 }
