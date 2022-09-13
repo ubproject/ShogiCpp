@@ -96,7 +96,37 @@ void normalmode() {
 }
 //お試しモード
 void testmode() {
-	//未完成
+	ID user = user2;
+	board main=true;
+	printf("使用する駒を選択してください。\n");
+	printf("駒		コード\n"
+			"玉将[王]	100\n"
+			"飛車[飛]	101\n"
+			"角行[角]	102\n"
+			"金将[金]	103\n"
+			"銀将[銀]	104\n"
+			"桂馬[桂]	105\n"
+			"香車[香]	106\n"
+			"歩兵[歩]	107\n"
+			"竜王(成飛車)[龍]201\n"
+			"竜馬(成角行)[馬]202\n"
+			"成銀[銀]	204\n"
+			"成桂[桂]	205\n"
+			"成香[香]	206\n"
+			"と金[と]	207\n"
+	);
+	UINT number = 0;
+	scanf_s("%u",&number);
+	if (!main.set_test((piece_info)number, { 3,6 }, user2)) {
+		errout("設定に失敗しました再入力してください。\n",2);
+		testmode();
+	}
+	errout("\n成功しました。\n",0);
+	while (1) {
+		main.show(user);
+		if (selectdialog(&main, user))return;
+		main.command_cls();
+	}
 }
 //操作説明
 void explanation() {

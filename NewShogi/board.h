@@ -1,17 +1,20 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+//user_haveで使用する
 #include <vector>
+
 #include "base.h"
 #include "piece.h"
 #include "SanaeUtil.h"
 
+//set_console_colorなどを使うため
 using namespace sanae::util;
 
 //駒の名前と所有者を格納
 typedef struct {
 	piece_info piece;
-	ID user;
+	ID         user;
 }basic_info;
 
 //エラー出力 0~2
@@ -34,17 +37,22 @@ void errout(const char* text,ID serverity) {
 		break;
 	}
 }
+
 //使われていないNONEを探して配列番号を返します
 UINT find_unused_none(NONE* data) {
 	for (UINT i = 0; i < NUM_ARRAY;i++)
 		if (!data[i].is_used)return i;
 	return 0;
 }
+
 /*board*/
 class board {
 protected:
+
 	piece_base* mainboard[NUM_ARRAY];
+
 private:
+
 	NONE	air[NUM_ARRAY];
 	KING    king   [2] = {user1,user2};
 	HISYA   hisya  [2] = {user1,user2};
@@ -54,18 +62,19 @@ private:
 	KEIMA   keima  [4] = {user1,user1,user2,user2};
 	KYOUSYA kyousya[4] = {user1,user1,user2,user2};
 	HUHYOU  huhyou[18];
+
 	//ユーザの持ち駒
 	std::vector<piece_base*> user1_have;
 	std::vector<piece_base*> user2_have;
 	
-	
 	//強制配置
-	void abs_set(position pos,piece_base* data) {
-		if (mainboard[pos_to_arraynum(pos)]->piece==piece_info::NONE) {
+	void abs_set(position pos, piece_base* data) {
+		if (mainboard[pos_to_arraynum(pos)]->piece == piece_info::NONE) {
 			mainboard[pos_to_arraynum(pos)]->is_used = false;
 		}
 		mainboard[pos_to_arraynum(pos)] = data;
 	}
+
 	bool is_true_move(piece_base* data,position from,position to,ID user) {
 		if (mainboard[pos_to_arraynum(from)]->user_id!=user) {
 			errout("あなたの駒ではありません。\n",0);
@@ -100,7 +109,7 @@ private:
 			return true;
 		switch (data->piece) {
 		case piece_info::HISYA:
-			return is_true_move_upall(mainboard,data,from,to)|| is_true_move_downall(mainboard, data, from, to)|| is_true_move_leftall(mainboard, data, from, to)||is_true_move_rightall(mainboard, data, from, to);
+			return is_true_move_upall(mainboard,data,from,to) || is_true_move_downall(mainboard, data, from, to) || is_true_move_leftall(mainboard, data, from, to) || is_true_move_rightall(mainboard, data, from, to);
 		case piece_info::KAKU:
 			return is_diagonal_all_caller(mainboard,data,from,to);
 		case piece_info::KYOUSYA:
@@ -108,16 +117,24 @@ private:
 		};
 		return false;
 	}
+
 public:
+
 	//ユーザの勝敗フラグ
 	bool user1_lose = false;
 	bool user2_lose = false;
+
+	//指定した駒の所有者と駒の名前を返します
+	basic_info get_basic_info(position pos) {
+		return { mainboard[pos_to_arraynum(pos)]->piece,mainboard[pos_to_arraynum(pos)]->user_id };
+	}
+
 	//駒の所有者を元に戻す
 	inline void clean() {
 		command_cls();
 		//ボードをまっさらにする
 		for (UINT i = 0; i < NUM_ARRAY; i++) {
-			mainboard[i] = &air[i];
+			mainboard[i]  = &air[i];
 		}
 		//歩兵の持ち主を初期化user1:user2
 		for (UINT i = 0; i < 18; i++) {
@@ -130,25 +147,38 @@ public:
 		}
 		//玉将,飛車,角の持ち主を通常へ戻す
 		for (UINT i = 0; i < 2; i++) {
-			ID user = i == 0 ? user1 : user2;
-			king[i] = user;
+			ID user  = i == 0 ? user1 : user2;
+			king[i]  = user;
 			hisya[i] = user;
-			kaku[i] = user;
+			kaku[i]  = user;
 		}
 		//金,銀,桂馬,香車の持ち主を通常へ戻す
 		for (UINT i = 0; i < 4; i++) {
-			ID user = i < 2 ? user1 : user2;
-			kin[i] = user;
-			gin[i] = user;
-			keima[i] = user;
+			ID user    = i < 2 ? user1 : user2;
+			kin[i]     = user;
+			gin[i]     = user;
+			keima[i]   = user;
 			kyousya[i] = user;
 		}
 	}
+
+	//コンストラクタ
 	board() {
 		clean();
 		set_basic_position();
 	}
-	//setbasicpos
+
+	//コンストラクタ:testmodeの引数がtrueの場合cleanのみを行う
+	board(bool testmode) {
+		if (testmode) {
+			clean();
+		} else {
+			clean();
+			set_basic_position();
+		}
+	}
+
+	//基本のポジションにする
 	inline void set_basic_position() {
 		//歩兵をセット
 		for (MINI i = 0; i < 9; i++)
@@ -184,9 +214,13 @@ public:
 		abs_set({ 1,7 }, &kaku[1]);
 		abs_set({ 7,7 }, &hisya[1]);
 	}
+
+	//画面クリアをする
 	void command_cls() {
 		system("cls");
 	}
+
+	//ボードを表示する
 	void show(ID user, position lightup = {-1,-1}) {
 		printf(" ０|１|２|３|４|５|６|７|８|X軸\n");
 		bool is_normal = lightup.x < 0 && lightup.y < 0;
@@ -226,46 +260,49 @@ public:
 		}
 		set_console_color();
 	}
+
 	//持ち駒確認&setする
 	bool have_pieces_set(ID user) {
 		std::vector<piece_base*>* user_have = user == user1 ? &user1_have : &user2_have;
 		printf("あなたの持ち駒\n");
 		for (UINT i = 0; i < user_have->size(); i++) {
-			printf("%u:",i);
+			printf("%u:", i);
 			(*user_have)[i]->show();
 			printf("\n");
 		}
 		printf("指す駒を選択してください。\n");
 		UINT num = 0;
-		scanf_s("%u",&num);
-		if (user_have->size() <= num) { 
+		scanf_s("%u", &num);
+		if (user_have->size() <= num) {
 			command_cls();
-			errout("指定したナンバーはありません\n",2);
+			errout("指定したナンバーはありません\n", 2);
 			return false;
 		}
 		printf("配置先を入力してください。\n");
-		MINI x=0, y=0;
+		MINI x = 0, y = 0;
 		printf("X:");
 		x = _getwch();
 		x -= '0';
-		printf("%d\n",x);
+		printf("%d\n", x);
 		printf("Y:");
 		y = _getwch();
 		y -= '0';
-		printf("%d\n",y);
-		if (mainboard[pos_to_arraynum({ x,y })]->piece!=piece_info::NONE) {
+		printf("%d\n", y);
+		if (mainboard[pos_to_arraynum({ x,y })]->piece != piece_info::NONE) {
 			command_cls();
-			errout("そこに置くことはできません。",2);
+			errout("そこに置くことはできません。", 2);
 			return false;
 		}
 		//指定の駒をセット
-		abs_set({x,y}, (*user_have)[num]);
+		abs_set({ x,y }, (*user_have)[num]);
 		//持ち駒から削除
-		(*user_have).erase((*user_have).begin()+num);
+		(*user_have).erase((*user_have).begin() + num);
 		command_cls();
-		errout("成功しました。",0);
+		errout("成功しました。", 0);
 		return true;
 	}
+
+	//ユーザの操作を反映&判定
 	bool userset(position from,position to,ID user) {
 		//操作しようとしている駒が自分のものか
 		if (mainboard[pos_to_arraynum(from)]->user_id != user) {
@@ -289,12 +326,12 @@ public:
 		else {
 			mainboard[pos_to_arraynum(from)] = &air[find_unused_none(air)];
 			std::vector<piece_base*>* user_have = user == user1 ? &user1_have : &user2_have;
-			buf->user_id = user;
+			buf->user_id     = user;
 			//入手した駒を初期化
 			if (buf->is_nari) {
-				UINT bufi = (UINT)buf->piece;
-				bufi -= 100;
-				buf->piece = (piece_info)bufi;
+				UINT bufi    = (UINT)buf->piece;
+				bufi        -= 100;
+				buf->piece   = (piece_info)bufi;
 				buf->is_nari = false;
 			}
 			if (buf->piece!=piece_info::KIN) {
@@ -304,8 +341,52 @@ public:
 		}
 		return true;
 	}
-	basic_info get_basic_info(position pos) {
-		return { mainboard[pos_to_arraynum(pos)]->piece,mainboard[pos_to_arraynum(pos)]->user_id};
+
+	/*テストモードで使われる*/
+	bool set_test(piece_info name,position setpos,ID user) {
+		//成っている場合
+		piece_info buf;
+		bool is_nari = false;
+		if ((UINT)name>200) {
+			UINT namebuf = (UINT)name;
+			namebuf     -= 100;
+			buf          = (piece_info)namebuf;
+			is_nari      = true;
+		} else {
+			buf = name;
+		}
+		switch (buf) {
+		case piece_info::KING:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &king[0]    : &king[1];
+			break;
+		case piece_info::HISYA:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &hisya[0]   : &hisya[1];
+			break;
+		case piece_info::KAKU:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &kaku[0]    : &kaku[1];
+			break;
+		case piece_info::KIN:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &kin[0]     : &kin[3];
+			break;
+		case piece_info::GIN:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &gin[0]     : &gin[3];
+			break;
+		case piece_info::KEIMA:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &keima[0]   : &keima[3];
+			break;
+		case piece_info::KYOUSYA:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &kyousya[0] : &kyousya[1];
+			break;
+		case piece_info::HUHYOU:
+			mainboard[pos_to_arraynum(setpos)] = user == user1 ? &huhyou[0]  : &huhyou[17];
+			break;
+		default:
+			return false;
+		}
+		if (is_nari) {
+			mainboard[pos_to_arraynum(setpos)]->is_nari = true;
+		}
+		return true;
 	}
 };
 #endif
