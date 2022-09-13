@@ -314,6 +314,17 @@ public:
 			errout("そこに置くことはできません。", 2);
 			return false;
 		}
+		//2歩は禁止
+		if ((*user_have)[num]->piece == piece_info::HUHYOU&& (*user_have)[num]->user_id==user) {
+			for (MINI i = 0; i < HEIGHT; i++) {
+				if (mainboard[pos_to_arraynum({ x,i })]->piece == piece_info::HUHYOU) {
+					command_cls();
+					errout("ルール違反です。\n", 2);
+					return false;
+				}
+			}
+		}
+
 		//指定の駒をセット
 		abs_set({ x,y }, (*user_have)[num]);
 		//持ち駒から削除

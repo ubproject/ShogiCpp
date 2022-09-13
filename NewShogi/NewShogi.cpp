@@ -11,17 +11,17 @@
 
 
 /*演出*/
-void delayprint(const char* text) {
+void delayprint(const char* text,bool fast=false) {
 	for (UINT i = 0; i < strlen(text);i++) {
 		printf("%c",*(text+i));
-		Sleep((DWORD)50);
+		Sleep(fast?(DWORD)5:(DWORD)20);
 	}
 }
-void delayprint_color(const char* text,colors c) {
+void delayprint_color(const char* text,colors c,bool fast=false) {
 	set_console_color(c,colors::black);
 	for (UINT i = 0; i < strlen(text); i++) {
 		printf("%c", *(text + i));
-		Sleep((DWORD)100);
+		Sleep(fast ? (DWORD)5 : (DWORD)20);
 	}
 	set_console_color();
 }
@@ -29,7 +29,7 @@ void delayprint_color(const char* text,colors c) {
 
 //駒操作のダイアログ
 bool selectdialog(board* main,ID user) {
-	printf("\n操作を選択してください。\nAキー:一手指す\nBキー:持ち駒を指す\nCキー:再表示\nDキー:降参する\n");
+	delayprint("\n操作を選択してください。\nAキー:一手指す\nBキー:持ち駒を指す\nCキー:再表示\nDキー:降参する\n",true);
 	switch (_getwch()) {
 	case 'a':
 		{//変数エラーをなくすため
@@ -52,15 +52,18 @@ bool selectdialog(board* main,ID user) {
 		if (x<0||y<0) {
 			errout("負の数の値はありません\n",2);
 			selectdialog(main,user);
+			return false;
 		}
 		if (x >= WIDTH || y >= WIDTH) {
 			errout("8以上の値はありません\n",2);
 			selectdialog(main,user);
+			return false;
 		}
 		basic_info data = main->get_basic_info({ (MINI)x,(MINI)y });
 		if (data.user != user) {
 			errout("指定した駒はあなたの駒ではありません。\n", 2);
 			selectdialog(main,user);
+			return false;
 		}
 
 		wint_t tox = 0, toy = 0;
@@ -84,10 +87,18 @@ bool selectdialog(board* main,ID user) {
 		if (tox < 0 || toy < 0) {
 			errout("負の数の値はありません\n", 2);
 			selectdialog(main, user);
+			return false;
 		}
+		if (tox >= WIDTH || toy >= WIDTH) {
+			errout("8以上の値はありません\n", 2);
+			selectdialog(main, user);
+			return false;
+		}
+
 		if (!main->userset({ (MINI)x,(MINI)y }, { (MINI)tox,(MINI)toy }, user)) {
 			errout("失敗しました再入力してください。\n", 2);
 			selectdialog(main, user);
+			return false;
 		}
 		if (main->user1_lose||main->user2_lose) {
 			set_console_color(colors::black,colors::white);
@@ -214,7 +225,7 @@ int main(){
 		set_console_color(colors::black, colors::white);
 		delayprint("将棋プログラム Ver:2.0\n");
 		set_console_color();
-		delayprint("ProjectName:Shogi\nDev:SanaeProject\nVer:2.0\n\n");
+		delayprint("ProjectName:Shogi\nDev:SanaeProject\nVer:2.0\n\n",true);
 		dialog();
 	}
 }
