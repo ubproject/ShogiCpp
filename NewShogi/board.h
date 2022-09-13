@@ -1,6 +1,9 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+/*基本的な動きを実装*/
+
+/*INCLUDE*/
 //user_haveで使用する
 #include <vector>
 
@@ -8,8 +11,10 @@
 #include "piece.h"
 #include "SanaeUtil.h"
 
+
 //set_console_colorなどを使うため
 using namespace sanae::util;
+
 
 //駒の名前と所有者を格納
 typedef struct {
@@ -17,7 +22,8 @@ typedef struct {
 	ID         user;
 }basic_info;
 
-//エラー出力 0~2
+
+//エラー出力 0~2 {0:緑 1:黄色 2:赤}
 void errout(const char* text,ID serverity) {
 	switch (serverity) {
 	case 0:
@@ -38,6 +44,7 @@ void errout(const char* text,ID serverity) {
 	}
 }
 
+
 //使われていないNONEを探して配列番号を返します
 UINT find_unused_none(NONE* data) {
 	for (UINT i = 0; i < NUM_ARRAY;i++)
@@ -45,14 +52,18 @@ UINT find_unused_none(NONE* data) {
 	return 0;
 }
 
+
 /*board*/
 class board {
 protected:
 
+	//ボード本体 *ポインタを格納
 	piece_base* mainboard[NUM_ARRAY];
 
 private:
 
+
+	/*駒すべて*/
 	NONE	air[NUM_ARRAY];
 	KING    king   [2] = {user1,user2};
 	HISYA   hisya  [2] = {user1,user2};
@@ -67,6 +78,7 @@ private:
 	std::vector<piece_base*> user1_have;
 	std::vector<piece_base*> user2_have;
 	
+
 	//強制配置
 	void abs_set(position pos, piece_base* data) {
 		if (mainboard[pos_to_arraynum(pos)]->piece == piece_info::NONE) {
@@ -75,6 +87,8 @@ private:
 		mainboard[pos_to_arraynum(pos)] = data;
 	}
 
+
+	//動きが合っているかを確認する(駒本体のis_true_moveと特殊なアルゴリズムで確認)&玉将をとられたか判定
 	bool is_true_move(piece_base* data,position from,position to,ID user) {
 		if (mainboard[pos_to_arraynum(from)]->user_id!=user) {
 			errout("あなたの駒ではありません。\n",0);
@@ -120,16 +134,18 @@ private:
 
 public:
 
-	//ユーザの勝敗フラグ
+	//ユーザの勝敗フラグ(board::is_true_moveによって判定)
 	bool user1_lose = false;
 	bool user2_lose = false;
+
 
 	//指定した駒の所有者と駒の名前を返します
 	basic_info get_basic_info(position pos) {
 		return { mainboard[pos_to_arraynum(pos)]->piece,mainboard[pos_to_arraynum(pos)]->user_id };
 	}
 
-	//駒の所有者を元に戻す
+
+	//駒の情報をすべて元に戻す
 	inline void clean() {
 		command_cls();
 		//ボードをまっさらにする
@@ -162,6 +178,7 @@ public:
 		}
 	}
 
+
 	//コンストラクタ
 	board() {
 		clean();
@@ -177,6 +194,7 @@ public:
 			set_basic_position();
 		}
 	}
+
 
 	//基本のポジションにする
 	inline void set_basic_position() {
@@ -215,10 +233,12 @@ public:
 		abs_set({ 7,7 }, &hisya[1]);
 	}
 
-	//画面クリアをする
+
+	//画面クリアをする(コマンド)
 	void command_cls() {
 		system("cls");
 	}
+
 
 	//ボードを表示する
 	void show(ID user, position lightup = {-1,-1}) {
@@ -261,6 +281,7 @@ public:
 		set_console_color();
 	}
 
+
 	//持ち駒確認&setする
 	bool have_pieces_set(ID user) {
 		std::vector<piece_base*>* user_have = user == user1 ? &user1_have : &user2_have;
@@ -302,6 +323,7 @@ public:
 		return true;
 	}
 
+
 	//ユーザの操作を反映&判定
 	bool userset(position from,position to,ID user) {
 		//操作しようとしている駒が自分のものか
@@ -341,6 +363,7 @@ public:
 		}
 		return true;
 	}
+
 
 	/*テストモードで使われる*/
 	bool set_test(piece_info name,position setpos,ID user) {

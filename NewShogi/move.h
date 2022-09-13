@@ -1,8 +1,11 @@
 #ifndef MOVE_H
 #define MOVE_H
 
-//position—p
+/*“®‚«‚ª‚ ‚Á‚Ä‚¢‚é‚©‚ğŠm”F‚·‚éŠÖ”ŒQ*/
+
+/*INCLUDE*/
 #include "base.h"
+
 
 /*“®‚«”»’è*/
 /*

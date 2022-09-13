@@ -1,8 +1,16 @@
-﻿#include "board.h"
+﻿/*INCLUDE*/
+#include "board.h"
 #include <time.h>
 #include <stdlib.h>
 
+/*本体
+* 基本情報:
+* author :SanaeProject
+* version:2.0
+*/
 
+
+/*演出*/
 void delayprint(const char* text) {
 	for (UINT i = 0; i < strlen(text);i++) {
 		printf("%c",*(text+i));
@@ -19,27 +27,33 @@ void delayprint_color(const char* text,colors c) {
 }
 
 
-//駒操作
+//駒操作のダイアログ
 bool selectdialog(board* main,ID user) {
 	printf("\n操作を選択してください。\nAキー:一手指す\nBキー:持ち駒を指す\nCキー:再表示\nDキー:降参する\n");
 	switch (_getwch()) {
 	case 'a':
 		{//変数エラーをなくすため
 		printf("動かす駒を選択してください。\n");
+
 		wint_t x = 0, y = 0;
+		
 		printf("X:");
 		x = _getwch();
+		//charの値を整数に戻す
 		x -= '0';
 		printf("%d\n",x);
+		
 		printf("Y:");
 		y = _getwch();
+		//charの値を整数に戻す
 		y -= '0';
 		printf("%d\n",y);
+		
 		if (x<0||y<0) {
 			errout("負の数の値はありません\n",2);
 			selectdialog(main,user);
 		}
-		if (x > 8 || y > 8) {
+		if (x >= WIDTH || y >= WIDTH) {
 			errout("8以上の値はありません\n",2);
 			selectdialog(main,user);
 		}
@@ -48,17 +62,24 @@ bool selectdialog(board* main,ID user) {
 			errout("指定した駒はあなたの駒ではありません。\n", 2);
 			selectdialog(main,user);
 		}
+
 		wint_t tox = 0, toy = 0;
+
 		main->command_cls();
 		main->show(user, { (MINI)x,(MINI)y });
-		errout("\n選択しました。移動先を選択してください。\n", 0);
+		delayprint_color("\n選択しました。移動先を選択してください。\n", colors::green);
+		
 		printf("X:");
 		tox = _getwch();
+		//charの値を整数に戻す
 		tox -= '0';
+
 		printf("%d\n", tox);
 		printf("Y:");
 		toy = _getwch();
+		//charの値を整数に戻す
 		toy -= '0';
+
 		printf("%d\n", toy);
 		if (tox < 0 || toy < 0) {
 			errout("負の数の値はありません\n", 2);
@@ -99,6 +120,8 @@ bool selectdialog(board* main,ID user) {
 	}
 	return false;
 }
+
+
 //通常対戦
 void normalmode() {
 	board main;
@@ -111,6 +134,8 @@ void normalmode() {
 		main.command_cls();
 	}
 }
+
+
 //お試しモード
 void testmode() {
 	ID user = user2;
@@ -146,6 +171,7 @@ void testmode() {
 	}
 }
 
+
 //詳細
 void info() {
 	system("cls");
@@ -159,6 +185,8 @@ void info() {
 	return;
 }
 
+
+//この関数により通常対戦かお試しモードか詳細へ送る
 void dialog() {
 	printf("モードを選択してください。\nAキー:対戦\nBキー:お試しモード\nCキー:プログラムの詳細\n\n");
 	switch (_getwch()) {
@@ -176,6 +204,9 @@ void dialog() {
 		break;
 	}
 }
+
+
+//main関数
 int main(){
 	system("title 将棋プログラム ver:2.0");
 	while (1) {
